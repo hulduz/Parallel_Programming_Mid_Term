@@ -4,6 +4,7 @@
 #include <omp.h>
 #include "./struct.h"
 #include "./kmeans_sequential.h"
+#include "./kmeans_parallel.h"
 
 #define NUM_POINTS 1000
 #define NUM_CLUSTERS 3

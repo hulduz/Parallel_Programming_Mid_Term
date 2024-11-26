@@ -15,8 +15,8 @@ void initialize_points(Point* points, int n) {
 
 void initialize_clusters(Cluster* clusters, Point* points, int k) {
     for (int i = 0; i < k; i++) {
-        clusters[i].centroid_x = points[rand() % k].x;
-        clusters[i].centroid_y = points[rand() % k].y;
+        clusters[i].centroid_x = points[rand() % n].x;
+        clusters[i].centroid_y = points[rand() % n].y;
         clusters[i].size = 0;
         clusters[i].new_centroid_x = 0.0;
         clusters[i].new_centroid_y = 0.0;
