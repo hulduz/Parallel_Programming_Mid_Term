@@ -4,8 +4,7 @@
 #include <omp.h>
 #include "struct.h"
 
-// Fonction pour trouver le cluster le plus proche (inchangée)
-int closest_cluster(Point p, Cluster* clusters, int k) {
+int closest_cluster_parallel(Point p, Cluster* clusters, int k) {
     int closest = 0;
     double min_dist = pow(p.x - clusters[0].centroid_x, 2) + pow(p.y - clusters[0].centroid_y, 2);
 
@@ -19,16 +18,7 @@ int closest_cluster(Point p, Cluster* clusters, int k) {
     return closest;
 }
 
-void initialize_points(Point* points, int n) {
-    for (int i = 0; i < n; i++) {
-        points[i].x = rand() / (double)RAND_MAX;
-        points[i].y = rand() / (double)RAND_MAX;
-        points[i].cluster_id = -1; //Aucun cluster assigné initialement
-    }
-}
-
-// Initialisation des clusters (inchangée)
-void initialize_clusters(Cluster* clusters, Point* points, int n, int k) {
+void initialize_clusters_parallel(Cluster* clusters, Point* points, int n, int k) {
     for (int i = 0; i < k; i++) {
         clusters[i].centroid_x = points[rand() % n].x;
         clusters[i].centroid_y = points[rand() % n].y;
@@ -38,16 +28,13 @@ void initialize_clusters(Cluster* clusters, Point* points, int n, int k) {
     }
 }
 
-// Assignation des clusters en parallèle
-void assign_clusters(Point* points, Cluster* clusters, int n, int k) {
-    // Réinitialisation des clusters
+void assign_clusters_parallel(Point* points, Cluster* clusters, int n, int k) {
     for (int i = 0; i < k; i++) {
         clusters[i].size = 0;
         clusters[i].new_centroid_x = 0.0;
         clusters[i].new_centroid_y = 0.0;
     }
 
-    // Assignation des points aux clusters en parallèle
     #pragma omp parallel
     {
         int* local_sizes = (int*)calloc(k, sizeof(int));
@@ -56,16 +43,14 @@ void assign_clusters(Point* points, Cluster* clusters, int n, int k) {
 
         #pragma omp for
         for (int i = 0; i < n; i++) {
-            int cluster_id = closest_cluster(points[i], clusters, k);
+            int cluster_id = closest_cluster_parallel(points[i], clusters, k);
             points[i].cluster_id = cluster_id;
 
-            // Mise à jour locale des centroids
             local_sizes[cluster_id]++;
             local_sums_x[cluster_id] += points[i].x;
             local_sums_y[cluster_id] += points[i].y;
         }
 
-        // Réduction pour mettre à jour les clusters globaux
         #pragma omp critical
         {
             for (int i = 0; i < k; i++) {
@@ -81,8 +66,7 @@ void assign_clusters(Point* points, Cluster* clusters, int n, int k) {
     }
 }
 
-// Mise à jour des centroids (inchangée)
-void update_centroids(Cluster* clusters, int k) {
+void update_centroids_parallel(Cluster* clusters, int k) {
     for (int i = 0; i < k; i++) {
         if (clusters[i].size > 0) {
             clusters[i].centroid_x = clusters[i].new_centroid_x / clusters[i].size;
@@ -91,12 +75,11 @@ void update_centroids(Cluster* clusters, int k) {
     }
 }
 
-// Fonction principale de k-means
-void kmeans(Point* points, Cluster* clusters, int n, int k, int iterations) {
-    initialize_clusters(clusters, points, n, k);
+void kmeans_parallel(Point* points, Cluster* clusters, int n, int k, int iterations) {
+    initialize_clusters_parallel(clusters, points, n, k);
 
     for (int iter = 0; iter < iterations; iter++) {
-        assign_clusters(points, clusters, n, k);
-        update_centroids(clusters, k);
+        assign_clusters_parallel(points, clusters, n, k);
+        update_centroids_parallel(clusters, k);
     }
 }

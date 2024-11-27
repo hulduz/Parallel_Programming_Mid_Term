@@ -5,15 +5,7 @@
 #include <omp.h>
 #include "struct.h"
 
-void initialize_points(Point* points, int n) {
-    for (int i = 0; i < n; i++) {
-        points[i].x = rand() / (double)RAND_MAX;
-        points[i].y = rand() / (double)RAND_MAX;
-        points[i].cluster_id = -1; // Initialement, aucun cluster assigné
-    }
-}
-
-void initialize_clusters(Cluster* clusters, Point* points, int k) {
+void initialize_clusters(Cluster* clusters, Point* points, int n, int k) {
     for (int i = 0; i < k; i++) {
         clusters[i].centroid_x = points[rand() % n].x;
         clusters[i].centroid_y = points[rand() % n].y;
@@ -64,7 +56,7 @@ void update_centroids(Cluster* clusters, int k) {
 }
 
 void kmeans(Point* points, Cluster* clusters, int n, int k, int iterations) {
-    initialize_clusters(clusters, points, k);
+    initialize_clusters(clusters, points, n, k);
 
     for (int iter = 0; iter < iterations; iter++) {
         assign_clusters(points, clusters, n, k);
