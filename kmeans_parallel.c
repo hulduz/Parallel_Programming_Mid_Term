@@ -23,7 +23,7 @@ void initialize_points(Point* points, int n) {
     for (int i = 0; i < n; i++) {
         points[i].x = rand() / (double)RAND_MAX;
         points[i].y = rand() / (double)RAND_MAX;
-        points[i].cluster_id = -1; // Aucun cluster assigné initialement
+        points[i].cluster_id = -1; //Aucun cluster assigné initialement
     }
 }
 
