@@ -92,6 +92,11 @@ void run_python_script() {
 }
 
 int main() {
+    remove("data.txt");
+    remove("labels.txt");
+    remove("centroids.txt");
+
+
     Point points_seq[NUM_POINTS], points_par[NUM_POINTS];
     Cluster clusters_seq[NUM_CLUSTERS], clusters_par[NUM_CLUSTERS];
 
